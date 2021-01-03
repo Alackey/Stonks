@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -28,7 +29,14 @@ func main() {
 	err = sess.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
-		return
+		os.Exit(1)
+	}
+
+	// Initialize stock client
+	err = NewStocksClient()
+	if err != nil {
+		log.Fatalln("Error create stocks client: ", err)
+		os.Exit(1)
 	}
 
 	// Wait here until CTRL-C or other term signal is received.
@@ -46,7 +54,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, "$q") {
-		s.ChannelMessageSend(m.ChannelID, "Hello world!")
+	// Quote - get price
+	if strings.HasPrefix(m.Content, "$q ") {
+		ticker := strings.TrimPrefix(m.Content, "$q ")
+
+		price, err := stocks.Quote(ticker)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		s.ChannelMessageSend(m.ChannelID, price)
 	}
 }

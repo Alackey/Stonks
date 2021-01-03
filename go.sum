@@ -1,6 +1,15 @@
 github.com/bwmarrin/discordgo v0.22.0 h1:uBxY1HmlVCsW1IuaPjpCGT6A2DBwRn0nvOguQIxDdFM=
 github.com/bwmarrin/discordgo v0.22.0/go.mod h1:c1WtWUGN6nREDmzIpyTp/iD3VYt4Fpx+bVyfBG7JE+M=
+github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/gorilla/websocket v1.4.0 h1:WDFjx/TMzVgy9VdMMQi2K2Emtwi2QcUQsztZ/zLaH/Q=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
+github.com/jszwec/csvutil v1.3.0 h1:d0zzXKQYvc22b4La5Wcp97CDgQ7JDLGJLm2NWqJGEYg=
+github.com/jszwec/csvutil v1.3.0/go.mod h1:Rpu7Uu9giO9subDyMCIQfHVDuLrcaC36UA4YcJjGBkg=
+github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/z-Wind/alphavantage v0.0.0-20200919040521-96315dce398e h1:DIFkyupbxqZp3/TU3fmi4dB+myhwZjGYUFy6HUhzH0E=
+github.com/z-Wind/alphavantage v0.0.0-20200919040521-96315dce398e/go.mod h1:GuwH2Yr3W6lWSdr9rcnM31zwLRSFSB9Ek+BIISH3Xns=
+github.com/z-Wind/stock v0.0.0-20191220144915-4fbf45ebed39/go.mod h1:PMdwlbHXAen3yIuBmCyoh/F58XwQoVenLFWwAh0X/5o=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 h1:y6ce7gCWtnH+m3dCjzQ1PCuwl28DDIc3VNnvY29DlIA=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
