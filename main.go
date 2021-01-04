@@ -16,7 +16,7 @@ func main() {
 
 	sess, err := discordgo.New("Bot " + botToken)
 	if err != nil {
-		fmt.Println("error creating Discord session,", err)
+		log.Fatalln("Error creating Discord session:", err)
 		return
 	}
 	defer sess.Close()
@@ -28,14 +28,14 @@ func main() {
 
 	err = sess.Open()
 	if err != nil {
-		fmt.Println("error opening connection,", err)
+		log.Fatalln("Error opening Discord connection:", err)
 		os.Exit(1)
 	}
 
 	// Initialize stock client
 	err = NewStocksClient()
 	if err != nil {
-		log.Fatalln("Error create stocks client: ", err)
+		log.Fatalln("Error creating stocks client:", err)
 		os.Exit(1)
 	}
 
