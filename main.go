@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	token := os.Getenv("DISCORD_BOT_TOKEN")
+	botToken := os.Getenv("DISCORD_BOT_TOKEN")
 
-	sess, err := discordgo.New("Bot " + token)
+	sess, err := discordgo.New("Bot " + botToken)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
@@ -54,15 +54,27 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	token := "$"
+
 	// Quote - get price
-	if strings.HasPrefix(m.Content, "$q ") {
-		ticker := strings.TrimPrefix(m.Content, "$q ")
+	if strings.HasPrefix(m.Content, token+"q ") {
+		ticker := strings.TrimPrefix(m.Content, token+"q ")
 
 		price, err := stocks.Quote(ticker)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalf("Error getting quote for ticker $%s: %v\n", ticker, err)
 		}
 
 		s.ChannelMessageSend(m.ChannelID, price)
+	}
+
+	// Market - get the market heatmap image
+	if strings.TrimSpace(m.Content) == token+"market" {
+		heatmap, err := stocks.Market()
+		if err != nil {
+			log.Fatalln("Error getting the market heatmap:", err)
+		}
+
+		s.ChannelFileSend(m.ChannelID, "marketHeatmap.png", heatmap)
 	}
 }
