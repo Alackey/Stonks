@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"os"
-	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -44,15 +43,14 @@ type StocksService struct {
 	client *alphavantage.Service
 }
 
-// Quote returns the current market price of the ticker given
-func (s *StocksService) Quote(ticker string) (string, error) {
+// Quote returns the quote object with the information about the stock
+func (s *StocksService) Quote(ticker string) (*alphavantage.Quote, error) {
 	quote, err := s.client.TimeSeries.QuoteEndpoint(ticker).Do()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	price := strconv.FormatFloat(quote.Price, 'f', 2, 64)
-	return price, nil
+	return quote, nil
 }
 
 // Market returns the market heatmap
@@ -66,7 +64,7 @@ func (s *StocksService) Market() (*bytes.Reader, error) {
 	}
 
 	downloader := s3manager.NewDownloader(awsSess)
-	
+
 	_, err := downloader.Download(awsBuf, input)
 	if err != nil {
 		return nil, err
