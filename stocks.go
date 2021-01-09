@@ -2,13 +2,15 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/z-Wind/alphavantage"
+	"github.com/spacecodewor/fmpcloud-go"
+	"github.com/spacecodewor/fmpcloud-go/objects"
 )
 
 var stocks *StocksService
@@ -20,16 +22,15 @@ func NewStocksClient() error {
 		return nil
 	}
 
-	// AlphaVantage
-	apiKey := os.Getenv("ALPHAVANTAGE_API_KEY")
-	client := alphavantage.GetClient(apiKey)
+	// Financial Modeling Prep
+	fmpAPIKey := os.Getenv("FMP_API_KEY")
 
-	service, err := alphavantage.New(client)
+	client, err := fmpcloud.NewAPIClient(fmpcloud.Config{APIKey: fmpAPIKey})
 	if err != nil {
 		return err
 	}
 
-	stocks = &StocksService{service}
+	stocks = &StocksService{client}
 
 	// AWS Session
 	awsSess = session.Must(session.NewSessionWithOptions(session.Options{
@@ -40,17 +41,21 @@ func NewStocksClient() error {
 
 // StocksService is the struct for calling stock api's
 type StocksService struct {
-	client *alphavantage.Service
+	client *fmpcloud.APIClient
 }
 
 // Quote returns the quote object with the information about the stock
-func (s *StocksService) Quote(ticker string) (*alphavantage.Quote, error) {
-	quote, err := s.client.TimeSeries.QuoteEndpoint(ticker).Do()
+func (s *StocksService) Quote(ticker string) (objects.StockQuote, error) {
+	// Get real-time single quote
+	quote, err := s.client.Stock.Quote(ticker)
 	if err != nil {
-		return nil, err
+		return objects.StockQuote{}, err
+	}
+	if len(quote) < 1 {
+		return objects.StockQuote{}, errors.New("No quote found for ticker: " + ticker)
 	}
 
-	return quote, nil
+	return quote[0], nil
 }
 
 // Market returns the market heatmap

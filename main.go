@@ -61,6 +61,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Quote - get price
 	if strings.HasPrefix(m.Content, token+"q ") {
 		ticker := strings.TrimPrefix(m.Content, token+"q ")
+		ticker = strings.ToUpper(ticker)
 
 		quote, err := stocks.Quote(ticker)
 		if err != nil {
@@ -69,7 +70,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-			Title: fmt.Sprintf("%s\n%.2f", strings.ToUpper(ticker), quote.Price),
+			Title: fmt.Sprintf("%s (%s)\n%.2f", quote.Name, ticker, quote.Price),
 			Color: 3447003,
 			Fields: []*discordgo.MessageEmbedField{
 				{
@@ -79,12 +80,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				},
 				{
 					Name:   "% Change",
-					Value:  fmt.Sprintf("%.2f%%", quote.ChangePercent),
+					Value:  fmt.Sprintf("%.2f%%", quote.ChangesPercentage),
 					Inline: true,
 				},
 				{
 					Name:   "Volume",
-					Value:  humanize.Commaf(quote.Volume),
+					Value:  humanize.Comma(quote.Volume),
 					Inline: true,
 				},
 				{
@@ -94,12 +95,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				},
 				{
 					Name:   "High",
-					Value:  strconv.FormatFloat(quote.High, 'f', 2, 64),
+					Value:  strconv.FormatFloat(quote.DayHigh, 'f', 2, 64),
 					Inline: true,
 				},
 				{
 					Name:   "Low",
-					Value:  strconv.FormatFloat(quote.Low, 'f', 2, 64),
+					Value:  strconv.FormatFloat(quote.DayLow, 'f', 2, 64),
 					Inline: true,
 				},
 			},
