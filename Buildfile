@@ -1,1 +1,1 @@
-make: go build -o bin/application main.go stocks.go
+make: go build -o bin/application .

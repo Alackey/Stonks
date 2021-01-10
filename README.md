@@ -90,7 +90,7 @@ A couple of things youll need before you can have Narwhal up and running:
    ```
 5. Start the bot
    ```sh
-   go run main.go stocks.go
+   go run .
    ```
 
 
@@ -114,10 +114,12 @@ All commands begin with the default "$" prefix. For example:
 
 ### Commands
 
-**$q SYMBOL** - Get the price information of a stock based off the stock symbol
+**$q `<symbol>`** - Get the price information of a stock based off the stock symbol
 
 
 **$market** - Shows a heatmap of the market and its sectors
+
+**$help** - Show a list of available commands
 
 
 <!-- CONTRIBUTING -->

@@ -45,14 +45,13 @@ type StocksService struct {
 }
 
 // Quote returns the quote object with the information about the stock
-func (s *StocksService) Quote(ticker string) (objects.StockQuote, error) {
-	// Get real-time single quote
-	quote, err := s.client.Stock.Quote(ticker)
+func (s *StocksService) Quote(symbol string) (objects.StockQuote, error) {
+	quote, err := s.client.Stock.Quote(symbol)
 	if err != nil {
 		return objects.StockQuote{}, err
 	}
 	if len(quote) < 1 {
-		return objects.StockQuote{}, errors.New("No quote found for ticker: " + ticker)
+		return objects.StockQuote{}, errors.New("No quote found for symbol: " + symbol)
 	}
 
 	return quote[0], nil
