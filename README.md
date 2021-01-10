@@ -114,12 +114,12 @@ All commands begin with the default "$" prefix. For example:
 
 ### Commands
 
-**$q `<symbol>`** - Get the price information of a stock based off the stock symbol
+**$q `<symbol>`** - Gets the price information of a stock based off the symbol
 
 
 **$market** - Shows a heatmap of the market and its sectors
 
-**$help** - Show a list of available commands
+**$help** - Shows a list of available commands
 
 
 <!-- CONTRIBUTING -->
