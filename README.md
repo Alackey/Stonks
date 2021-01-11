@@ -95,7 +95,7 @@ A couple of things youll need before you can have Narwhal up and running:
 
 
 ### AWS Elastic Beanstalk
-I am curren't hosting this bot on AWS Elastic Beanstalk, and to deploy this app to a currently existing Elastic Beakstalk environment you would run the command below. 
+I am currently hosting this bot on AWS Elastic Beanstalk, and to deploy this app to a currently existing Elastic Beakstalk environment you would run the command below. 
 
 ```sh
 eb deploy {ENVIRONMENT_NAME}
