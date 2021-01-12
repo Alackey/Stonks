@@ -83,7 +83,7 @@ A couple of things youll need before you can have Narwhal up and running:
    ```sh
    go mod download
    ```
-4. Set environment Variables
+4. Set environment variables manually, or copy the .env.example and create a .env file with the environment variables
    ```sh
    DISCORD_BOT_TOKEN={BOT_TOKEN}
    FMP_API_KEY={API_KEY}

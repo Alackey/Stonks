@@ -24,6 +24,9 @@ func NewStocksClient() error {
 
 	// Financial Modeling Prep
 	fmpAPIKey := os.Getenv("FMP_API_KEY")
+	if fmpAPIKey == "" {
+		return errors.New("Must set environment variable FMP_API_KEY")
+	}
 
 	client, err := fmpcloud.NewAPIClient(fmpcloud.Config{APIKey: fmpAPIKey})
 	if err != nil {
