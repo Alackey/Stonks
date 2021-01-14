@@ -35,6 +35,36 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSendEmbed(m.ChannelID, createQuoteMessage(symbol, quote))
 	}
 
+	// Futures - get the futures data
+	if strings.TrimSpace(m.Content) == token+"futures" {
+		quote, err := stocks.Futures()
+		if err != nil {
+			log.Fatalln("Error getting futures:", err)
+			return
+		}
+
+		esChange := addPlus(quote.ES.ChangeInDouble)
+		esPercentChange := addPlus(quote.ES.FuturePercentChange * 100)
+
+		nqChange := addPlus(quote.NQ.ChangeInDouble)
+		nqPercentChange := addPlus(quote.NQ.FuturePercentChange * 100)
+
+		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+			Title: "Futures",
+			Color: 3447003,
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					Name:  "S&P 500",
+					Value: fmt.Sprintf("%s (%s%%)", esChange, esPercentChange),
+				},
+				{
+					Name:  "NASDAQ",
+					Value: fmt.Sprintf("%s (%s%%)", nqChange, nqPercentChange),
+				},
+			},
+		})
+	}
+
 	// Market - get the market heatmap image
 	if strings.TrimSpace(m.Content) == token+"market" {
 		heatmap, err := stocks.Market()
@@ -96,4 +126,13 @@ func createQuoteMessage(symbol string, quote objects.StockQuote) *discordgo.Mess
 			},
 		},
 	}
+}
+
+// addPlus converts a float64 to string and adds a "+" if it is a positive number
+func addPlus(num float64) string {
+	result := strconv.FormatFloat(num, 'f', 2, 64)
+	if num > 0 {
+		return "+" + result
+	}
+	return result
 }

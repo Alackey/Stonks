@@ -84,10 +84,6 @@ A couple of things youll need before you can have Narwhal up and running:
    go mod download
    ```
 4. Set environment variables manually, or copy the .env.example and create a .env file with the environment variables
-   ```sh
-   DISCORD_BOT_TOKEN={BOT_TOKEN}
-   FMP_API_KEY={API_KEY}
-   ```
 5. Start the bot
    ```sh
    go run .
@@ -116,6 +112,7 @@ All commands begin with the default "$" prefix. For example:
 
 **$q \<symbol>** - Gets the price information of a stock based off the symbol
 
+**$futures** - Gets the price information of some futures
 
 **$market** - Shows a heatmap of the market and its sectors
 

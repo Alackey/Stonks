@@ -2,15 +2,18 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"os"
 
+	"github.com/alackey/go-tdameritrade"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spacecodewor/fmpcloud-go"
 	"github.com/spacecodewor/fmpcloud-go/objects"
+	"golang.org/x/oauth2"
 )
 
 var stocks *StocksService
@@ -28,12 +31,43 @@ func NewStocksClient() error {
 		return errors.New("Must set environment variable FMP_API_KEY")
 	}
 
-	client, err := fmpcloud.NewAPIClient(fmpcloud.Config{APIKey: fmpAPIKey})
+	fmpClient, err := fmpcloud.NewAPIClient(fmpcloud.Config{APIKey: fmpAPIKey})
 	if err != nil {
 		return err
 	}
 
-	stocks = &StocksService{client}
+	// TD Ameritrade
+	tdaAPIKey := os.Getenv("TDAMERITRADE_API_KEY")
+	if tdaAPIKey == "" {
+		return errors.New("Must set environment variable TDAMERITRADE_API_KEY")
+	}
+
+	tdaRefreshToken := os.Getenv("TDAMERITRADE_REFRESH_TOKEN")
+	if tdaRefreshToken == "" {
+		return errors.New("Must set environment variable TDAMERITRADE_REFRESH_TOKEN")
+	}
+
+	oauthConfig := oauth2.Config{
+		ClientID: tdaAPIKey,
+		Endpoint: oauth2.Endpoint{
+			TokenURL: "https://api.tdameritrade.com/v1/oauth2/token",
+		},
+		RedirectURL: "http://localhost",
+	}
+
+	oauthToken := &oauth2.Token{
+		RefreshToken: tdaRefreshToken,
+	}
+
+	ctx := context.Background()
+	httpClient := oauthConfig.Client(ctx, oauthToken)
+
+	tdaClient, err := tdameritrade.NewClient(httpClient)
+	if err != nil {
+		return err
+	}
+
+	stocks = &StocksService{fmp: fmpClient, tdameritrade: tdaClient}
 
 	// AWS Session
 	awsSess = session.Must(session.NewSessionWithOptions(session.Options{
@@ -42,14 +76,21 @@ func NewStocksClient() error {
 	return nil
 }
 
+// FuturesData contains the futures and their data
+type FuturesData struct {
+	ES *tdameritrade.Quote
+	NQ *tdameritrade.Quote
+}
+
 // StocksService is the struct for calling stock api's
 type StocksService struct {
-	client *fmpcloud.APIClient
+	fmp          *fmpcloud.APIClient
+	tdameritrade *tdameritrade.Client
 }
 
 // Quote returns the quote object with the information about the stock
 func (s *StocksService) Quote(symbol string) (objects.StockQuote, error) {
-	quote, err := s.client.Stock.Quote(symbol)
+	quote, err := s.fmp.Stock.Quote(symbol)
 	if err != nil {
 		return objects.StockQuote{}, err
 	}
@@ -58,6 +99,35 @@ func (s *StocksService) Quote(symbol string) (objects.StockQuote, error) {
 	}
 
 	return quote[0], nil
+}
+
+// Futures returns data for specific futures
+func (s *StocksService) Futures() (*FuturesData, error) {
+	ctx := context.Background()
+
+	// S&P 500
+	symbol := "/ES"
+	quotesES, _, err := s.tdameritrade.Quotes.GetQuotes(ctx, symbol)
+	if err != nil {
+		return nil, err
+	}
+	if len(*quotesES) <= 0 {
+		return nil, errors.New("no quote found for future " + symbol)
+	}
+	es := (*quotesES)[symbol]
+
+	// NASDAQ
+	symbol = "/NQ"
+	quotesNQ, _, err := s.tdameritrade.Quotes.GetQuotes(ctx, symbol)
+	if err != nil {
+		return nil, err
+	}
+	if len(*quotesNQ) <= 0 {
+		return nil, errors.New("no quote found for future " + symbol)
+	}
+	nq := (*quotesNQ)[symbol]
+
+	return &FuturesData{ES: es, NQ: nq}, nil
 }
 
 // Market returns the market heatmap
