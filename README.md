@@ -112,7 +112,7 @@ All commands begin with the default "$" prefix. For example:
 
 **$q \<symbol>** - Gets the price information of a stock based off the symbol
 
-**$futures** - Gets the price information of some futures
+**$futures** - Gets the price information for some futures
 
 **$market** - Shows a heatmap of the market and its sectors
 

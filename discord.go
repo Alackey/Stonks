@@ -81,6 +81,7 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 			Title: "Stonk Bot Help",
 			Description: "`$q <symbol>` - Get the price information about the stock symbol\n" +
+				"`$futures` - Get the price information for some futures\n" +
 				"`$market` - Get a heatmap of the market and its sectors\n" +
 				"`$help` - Get this help message",
 			Color: 3447003,
