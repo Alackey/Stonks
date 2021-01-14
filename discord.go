@@ -96,12 +96,12 @@ func createQuoteMessage(symbol string, quote objects.StockQuote) *discordgo.Mess
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Change",
-				Value:  strconv.FormatFloat(quote.Change, 'f', 2, 64),
+				Value:  addPlus(quote.Change),
 				Inline: true,
 			},
 			{
 				Name:   "% Change",
-				Value:  fmt.Sprintf("%.2f%%", quote.ChangesPercentage),
+				Value:  addPlus(quote.ChangesPercentage) + "%",
 				Inline: true,
 			},
 			{

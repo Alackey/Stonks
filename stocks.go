@@ -39,12 +39,12 @@ func NewStocksClient() error {
 	// TD Ameritrade
 	tdaAPIKey := os.Getenv("TDAMERITRADE_API_KEY")
 	if tdaAPIKey == "" {
-		return errors.New("Must set environment variable TDAMERITRADE_API_KEY")
+		return errors.New("must set environment variable TDAMERITRADE_API_KEY")
 	}
 
 	tdaRefreshToken := os.Getenv("TDAMERITRADE_REFRESH_TOKEN")
 	if tdaRefreshToken == "" {
-		return errors.New("Must set environment variable TDAMERITRADE_REFRESH_TOKEN")
+		return errors.New("must set environment variable TDAMERITRADE_REFRESH_TOKEN")
 	}
 
 	oauthConfig := oauth2.Config{
@@ -95,7 +95,7 @@ func (s *StocksService) Quote(symbol string) (objects.StockQuote, error) {
 		return objects.StockQuote{}, err
 	}
 	if len(quote) < 1 {
-		return objects.StockQuote{}, errors.New("No quote found for symbol: " + symbol)
+		return objects.StockQuote{}, errors.New("no quote found for symbol: " + symbol)
 	}
 
 	return quote[0], nil
