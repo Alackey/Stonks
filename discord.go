@@ -13,18 +13,21 @@ import (
 
 // onMessageCreate handles Message Create events
 func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	// Ignore all messages created by the bot itself
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.ID == s.State.User.ID || !strings.HasPrefix(m.Content, "$") {
 		return
 	}
 
-	token := "$"
+	args := strings.Fields(m.Content[1:])
+	args[0] = strings.ToLower(args[0])
 
 	// Quote - get price
-	if strings.HasPrefix(m.Content, token+"q ") {
-		symbol := strings.TrimPrefix(m.Content, token+"q ")
-		symbol = strings.ToUpper(symbol)
+	if args[0] == "q" {
+		if len(args) < 2 {
+			return
+		}
+
+		symbol := strings.ToUpper(args[1])
 
 		quote, err := stocks.Quote(symbol)
 		if err != nil {
@@ -36,7 +39,7 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// Futures - get the futures data
-	if strings.TrimSpace(m.Content) == token+"futures" {
+	if args[0] == "futures" {
 		quote, err := stocks.Futures()
 		if err != nil {
 			log.Fatalln("Error getting futures:", err)
@@ -66,8 +69,13 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// Market - get the market heatmap image
-	if strings.TrimSpace(m.Content) == token+"market" {
-		image, err := stocks.Market("Stock Market")
+	if args[0] == "market" {
+		key := "Stock Market"
+		if len(args) > 1 && strings.ToLower(args[1]) == "crypto" {
+			key = "Crypto"
+		}
+
+		image, err := stocks.Market(key)
 		if err != nil {
 			log.Fatalln("Error getting the market heatmap:", err)
 			return
@@ -77,12 +85,13 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// Help - get list of commands
-	if strings.TrimSpace(m.Content) == token+"help" {
+	if args[0] == "help" {
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 			Title: "Stonk Bot Help",
 			Description: "`$q <symbol>` - Get the price information about the stock symbol\n" +
 				"`$futures` - Get the price information for some futures\n" +
 				"`$market` - Get a heatmap of the market and its sectors\n" +
+				"`$market crypto` - Get a heatmap of the crypto market\n" +
 				"`$help` - Get this help message",
 			Color: 3447003,
 		})

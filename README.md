@@ -116,6 +116,8 @@ All commands begin with the default "$" prefix. For example:
 
 **$market** - Shows a heatmap of the market and its sectors
 
+**$market crypto** - Shows a heatmap of the crypto market
+
 **$help** - Shows a list of available commands
 
 

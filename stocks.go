@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/alackey/go-tdameritrade"
 	"github.com/aws/aws-sdk-go/aws"
@@ -88,7 +89,7 @@ type StocksService struct {
 
 // Quote returns the quote object with the information about the stock
 func (s *StocksService) Quote(symbol string) (objects.StockQuote, error) {
-	quote, err := s.fmp.Stock.Quote(symbol)
+	quote, err := s.fmp.Stock.Quote(strings.ToUpper(symbol))
 	if err != nil {
 		return objects.StockQuote{}, err
 	}
