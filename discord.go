@@ -67,13 +67,13 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Market - get the market heatmap image
 	if strings.TrimSpace(m.Content) == token+"market" {
-		heatmap, err := stocks.Market()
+		image, err := stocks.Market("Stock Market")
 		if err != nil {
 			log.Fatalln("Error getting the market heatmap:", err)
 			return
 		}
 
-		s.ChannelFileSend(m.ChannelID, "marketHeatmap.png", heatmap)
+		s.ChannelMessageSend(m.ChannelID, image)
 	}
 
 	// Help - get list of commands
