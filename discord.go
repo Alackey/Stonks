@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/dustin/go-humanize"
@@ -84,6 +85,24 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, image)
 	}
 
+	// News - get the latest newest for a stock
+	if args[0] == "news" {
+		if len(args) < 2 {
+			return
+		}
+		symbol := strings.ToUpper(args[1])
+
+		news, err := stocks.News(symbol)
+		if err != nil {
+			log.Fatalf("Error getting quote for symbol $%s: %v\n", symbol, err)
+			return
+		}
+
+		if len(news) > 0 {
+			s.ChannelMessageSendEmbed(m.ChannelID, createNewsMessage(symbol, news))
+		}
+	}
+
 	// Help - get list of commands
 	if args[0] == "help" {
 		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
@@ -92,6 +111,7 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				"`$futures` - Get the price information for some futures\n" +
 				"`$market` - Get a heatmap of the market and its sectors\n" +
 				"`$market crypto` - Get a heatmap of the crypto market\n" +
+				"`$news <symbol>` - Get the most recent news about a stock\n" +
 				"`$help` - Get this help message",
 			Color: 3447003,
 		})
@@ -135,6 +155,34 @@ func createQuoteMessage(symbol string, quote objects.StockQuote) *discordgo.Mess
 				Inline: true,
 			},
 		},
+	}
+}
+
+// createNewsMessage creates the news message response for the news command
+func createNewsMessage(symbol string, news []objects.StockNews) *discordgo.MessageEmbed {
+	var fields []*discordgo.MessageEmbedField
+
+	for _, v := range news {
+		var publishedDate string
+		dateTime, err := time.Parse("2006-01-02 15:04:05", v.PublishedDate)
+		if err != nil {
+			log.Printf("Could not parse published date: %s\n", err.Error())
+		} else {
+			publishedDate = dateTime.Format("Mon Jan 2 2006, 3:04 PM")
+		}
+
+		field := &discordgo.MessageEmbedField{
+			Name:  v.Title,
+			Value: fmt.Sprintf("%s\n%s\n[Read More](%s)", publishedDate, v.Text, v.URL),
+			
+		}
+		fields = append(fields, field)
+	}
+
+	return &discordgo.MessageEmbed{
+		Title:  fmt.Sprintf("%s News", symbol),
+		Color:  3447003,
+		Fields: fields,
 	}
 }
 

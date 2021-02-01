@@ -118,6 +118,8 @@ All commands begin with the default "$" prefix. For example:
 
 **$market crypto** - Shows a heatmap of the crypto market
 
+**$news \<symbol>** - Gets the most recent news about a stock based off the symbol
+
 **$help** - Shows a list of available commands
 
 

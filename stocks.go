@@ -149,3 +149,17 @@ func (s *StocksService) Market(key string) (string, error) {
 
 	return *result.Item["Image"].S, nil
 }
+
+// News returns the most recent news about the stock symbol
+func (s *StocksService) News(symbol string) ([]objects.StockNews, error) {
+	request := objects.RequestStockNews{
+		SymbolList: []string{symbol},
+		Limit:      5,
+	}
+
+	news, err := s.fmp.CompanyValuation.StockNews(request)
+	if err != nil {
+		return nil, err
+	}
+	return news, nil
+}
