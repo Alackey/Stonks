@@ -71,9 +71,9 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Market - get the market heatmap image
 	if args[0] == "market" {
-		key := "Stock Market"
+		key := "marketHeatmap.png"
 		if len(args) > 1 && strings.ToLower(args[1]) == "crypto" {
-			key = "Crypto"
+			key = "cryptoHeatmap.png"
 		}
 
 		image, err := stocks.Market(key)
@@ -82,7 +82,7 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		s.ChannelMessageSend(m.ChannelID, image)
+		s.ChannelFileSend(m.ChannelID, "heatmap.png", image)
 	}
 
 	// News - get the latest newest for a stock
@@ -174,7 +174,6 @@ func createNewsMessage(symbol string, news []objects.StockNews) *discordgo.Messa
 		field := &discordgo.MessageEmbedField{
 			Name:  v.Title,
 			Value: fmt.Sprintf("%s\n%s\n[Read More](%s)", publishedDate, v.Text, v.URL),
-			
 		}
 		fields = append(fields, field)
 	}

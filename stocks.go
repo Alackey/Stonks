@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"os"
@@ -9,7 +10,8 @@ import (
 	"github.com/alackey/go-tdameritrade"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spacecodewor/fmpcloud-go"
 	"github.com/spacecodewor/fmpcloud-go/objects"
 	"golang.org/x/oauth2"
@@ -130,24 +132,23 @@ func (s *StocksService) Futures() (*FuturesData, error) {
 }
 
 // Market returns the market heatmap
-func (s *StocksService) Market(key string) (string, error) {
-	svc := dynamodb.New(awsSess)
+func (s *StocksService) Market(key string) (*bytes.Reader, error) {
+	var buf []byte
+	awsBuf := aws.NewWriteAtBuffer(buf)
 
-	input := &dynamodb.GetItemInput{
-		Key: map[string]*dynamodb.AttributeValue{
-			"Name": {
-				S: aws.String(key),
-			},
-		},
-		TableName: aws.String("Stonks_Heatmaps"),
+	input := &s3.GetObjectInput{
+		Bucket: aws.String("stockbot-heatmap"),
+		Key:    aws.String(key),
 	}
 
-	result, err := svc.GetItem(input)
+	downloader := s3manager.NewDownloader(awsSess)
+
+	_, err := downloader.Download(awsBuf, input)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return *result.Item["Image"].S, nil
+	return bytes.NewReader(awsBuf.Bytes()), nil
 }
 
 // News returns the most recent news about the stock symbol
